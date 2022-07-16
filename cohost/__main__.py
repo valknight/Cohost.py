@@ -10,7 +10,7 @@ def main():
         print('To skip this, please set the COHOST_COOKIE environment variable to the cookie you want to use')
         cookie = input('COHOST_COOKIE: ')
     user = User.loginWithCookie(cookie)
-    print("Established connection as: {}".format(user))
+    """print("Established connection as: {}".format(user))
     #print(user.editedProjects)
     print('Default project: {}'.format(user.defaultProject))
     posts = user.defaultProject.getPosts()
@@ -36,6 +36,11 @@ def main():
     project = posts[-1].ogAuthor
     print('Project: @{}'.format(project.handle))
     print('{} posts retrieved!'.format(len(project.getPosts())))
+    print('===')"""
+    print('Notifications:')
+    notifs = user.notifications
+    for notif in notifs:
+        print(notif)
 
 if __name__ == '__main__':
     main()

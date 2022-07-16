@@ -27,7 +27,8 @@ def fetch(method: str, endpoint, data: dict, cookies="", complex=False):
     Returns:
         _type_: _description_
     """
-
+    if not endpoint.startswith('/'):
+        endpoint = "/" + endpoint
     url = API_BASE + endpoint
     l.debug('{} to {}'.format(method, url))
     if method.lower() == "get":

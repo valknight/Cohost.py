@@ -1,6 +1,8 @@
+from distutils.command.build import build
 from re import U
 from cohost.models.project import EditableProject
-from cohost.network import fetch, fetchTrpc
+from cohost.network import fetch, fetchTrpc, generate_login_cookies
+from cohost.models.notification import buildFromNotifList
 import hashlib
 import base64
 
@@ -95,7 +97,21 @@ class User:
         # If this didn't error out, we're good!
         return u
 
+    def resolveSecondaryProject(self, projectData):
+        from cohost.models.project import Project, EditableProject
+        editableProjects = self.editedProjects
+        for project in editableProjects:
+            if project.projectId == projectData['projectId']:
+                return project  # type: EditableProject
+        return Project(self, projectData)  # type: Project
 
+    @property
+    def notifications(self):
+        nJson = fetch('GET', 'notifications/list', {
+            'offset': 0,
+            'limit': 5000
+        }, generate_login_cookies(self.cookie))
+        return buildFromNotifList(nJson, self)
 """
 
 def getProjects() {

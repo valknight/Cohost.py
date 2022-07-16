@@ -68,7 +68,7 @@ class Post:
             newProject = self.postData['shareTree'][0]['postingProject']
         else:
             newProject = self.postData['postingProject']
-        return self.resolveSecondaryProject(newProject)
+        return self.project.user.resolveSecondaryProject(newProject)
 
     @property
     def shareTree(self):
@@ -78,7 +78,7 @@ class Post:
     def relatedProjects(self) -> list:
         projects = []
         for p in self.postData['relatedProjects']:
-            projects.append(self.resolveSecondaryProject(p))
+            projects.append(self.project.user.resolveSecondaryProject(p))
         return projects
 
     @property
@@ -122,24 +122,3 @@ class Post:
     @property
     def publishable(self) -> bool:
         return self.postData['canPublish']
-
-    def resolveSecondaryProject(self, projectData):
-        from cohost.models.user import User
-        user = None  # type: User
-        if type(self.project) == EditableProject:
-            # ah SICK ok, this means this project has a live auth token attached
-            user = self.project.user
-        if user is None:
-            # ok, we have no authentication, so we can't resolve the secondary project
-            # We'll just use a dummy project
-            return Project(projectData, user)
-
-    def resolveSecondaryProject(self, projectData):
-        from cohost.models.project import Project, EditableProject
-        from cohost.models.user import User
-        user = self.project.user  # type: User
-        editableProjects = user.editedProjects
-        for project in editableProjects:
-            if project.projectId == projectData['projectId']:
-                return project  # type: EditableProject
-        return Project(user, projectData)  # type: Project
