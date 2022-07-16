@@ -1,5 +1,8 @@
 # Cohost.py
 
+![Edit of Eggbug into the python logo](pybug.png)
+
+
 A python library for Cohost!
 
 ## Quickstart
@@ -80,3 +83,7 @@ If you think one of these should be implemented, please file a GitHub issue with
 ## Support Cohost
 
 [Buy Cohost PLUS](https://cohost.org/rc/user/settings)
+
+## Follow me on Cohost!
+
+[hello is me](https://cohost.org/vallerie)
