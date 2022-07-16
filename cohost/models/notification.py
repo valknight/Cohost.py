@@ -3,6 +3,9 @@ class BaseNotification:
         self.createdAt = createdAt
         self.fromProject = fromProject
 
+    @property
+    def timestamp(self):
+        return self.createdAt
 
 class Like(BaseNotification):
     def __init__(self, createdAt, fromProject, toPost, relationshipId):
@@ -11,7 +14,7 @@ class Like(BaseNotification):
         self.relationshipId = relationshipId
     
     def __str__(self) -> str:
-        return "{} liked {}".format(self.fromProject.handle, self.toPost.postId)
+        return "{} liked {} | {}".format(self.fromProject.handle, self.toPost.postId, self.timestamp)
 
 
 class Share(BaseNotification):
@@ -23,8 +26,8 @@ class Share(BaseNotification):
     
     def __str__(self) -> str:
         if self.transparentShare:
-            return "{} shared {} with extra".format(self.fromProject.handle, self.toPost.postId)
-        return "{} shared {}".format(self.fromProject.handle, self.toPost.postId)
+            return "{} shared {} with extra | {}".format(self.fromProject.handle, self.toPost.postId, self.timestamp)
+        return "{} shared {} | {}".format(self.fromProject.handle, self.toPost.postId, self.timestamp)
 
 
 class Comment(BaseNotification):
@@ -35,14 +38,14 @@ class Comment(BaseNotification):
         self.inReplyTo = inReplyTo
 
     def __str__(self) -> str:
-        return "{} commented on {} - \"{}\"".format(self.fromProject.handle, self.toPost.postId, self.comment.body)
+        return "{} commented on {} - \"{}\" | {}".format(self.fromProject.handle, self.toPost.postId, self.comment.body, self.timestamp)
 
 class Follow(BaseNotification):
     def __init__(self, createdAt, fromProject):
         super().__init__(createdAt, fromProject)
     
     def __str__(self) -> str:
-        return "{} is now following you".format(self.fromProject.handle)
+        return "{} is now following you | {}".format(self.fromProject.handle, self.timestamp)
 
 
 def buildFromNotifList(notificationsApiResp: dict, user):
