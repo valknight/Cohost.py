@@ -43,11 +43,20 @@ To function, you need a token for Cohost. This can be retrieved by:
 3. Find the "Cookies" entry
 4. Copy the data for "`connect.sid`".
 5. Use this in the library
+
+## What's working? (allegedly)
+
+- Logging in as a user (using a cookie)
+- Retrieving projects of a user (and of other people when you got a post to go with it)
+- Retrieving posts of a page
+- Posting to a page (with image support!)
+- Retrieving notifications
 ## What's not done but needs to be done?
 
 - Logging in with a username and password - this is possible (Cohost.js does it!) so feel free to create a pull request for this :)
 - Retrieving single posts - currently have to read entire projects
 - Retrieving a project's drafts
+- Retrieving a projects of others without a post inbetween
 - Sharing posts (with comment)
 - Editing profiles
 - Deleting posts
