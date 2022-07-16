@@ -1,6 +1,6 @@
 # Cohost.py
 
-![Edit of Eggbug into the python logo](pybug.png)
+![Edit of Eggbug into the python logo](pybug_small.png)
 
 
 A python library for Cohost!
