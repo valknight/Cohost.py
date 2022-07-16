@@ -33,8 +33,12 @@ def fetch(method: str, endpoint, data: dict, cookies="", complex=False):
     l.debug('{} to {}'.format(method, url))
     if method.lower() == "get":
         req = requests.get(url, cookies=cookies, params=data)
-    elif method == "post":
+    elif method.lower() == "post":
         req = requests.post(url, cookies=cookies, data=data)
+    elif method.lower() == 'postjson':
+        req = requests.post(url, cookies=cookies, json=data)
+    elif method.lower() == 'put':
+        req = requests.put(url, cookies=cookies, json=data)
     else:
         l.error('No such method handled: ' + method)
         l.error('Defaulting to get')
@@ -45,7 +49,7 @@ def fetch(method: str, endpoint, data: dict, cookies="", complex=False):
     except:
         res = req.text()
 
-    if (req.status_code >= 400):
+    if (req.status_code >= 400 and method != 'put'):
         raise Exception(res)
     if complex:
         return {

@@ -1,5 +1,6 @@
 from cohost.models.user import User
 from cohost.models.post import Post
+from cohost.models.block import AttachmentBlock, MarkdownBlock
 from cohost.models.project import Project, EditableProject
 import os
 import json
@@ -10,37 +11,19 @@ def main():
         print('To skip this, please set the COHOST_COOKIE environment variable to the cookie you want to use')
         cookie = input('COHOST_COOKIE: ')
     user = User.loginWithCookie(cookie)
-    """print("Established connection as: {}".format(user))
-    #print(user.editedProjects)
-    print('Default project: {}'.format(user.defaultProject))
-    posts = user.defaultProject.getPosts()
-    for p in posts:
-        p = p # type: Post
-        print(p, end = ' | ')
-        if type(p.ogAuthor) == EditableProject:
-            print(' OG author: you! |', end = ' ')
-        else:
-            print('OG author: {} |'.format(p.ogAuthor), end=' ')
-        if len(p.relatedProjects) > 0:
-            print("Related projects:", end= " ")
-            names = []
-            for r in p.relatedProjects:
-                if type(r) == EditableProject:
-                    names.append('@{}(you!)'.format(r.handle))
-                else:
-                    names.append('@{}'.format(r.handle))
-            print(', '.join(names), end = ' | ')
-        print("")
-    print('[DONE - {} POSTS]'.format(len(posts)))
-    print('Getting posts from someone who isn\'t you... (using last project on list)')
-    project = posts[-1].ogAuthor
-    print('Project: @{}'.format(project.handle))
-    print('{} posts retrieved!'.format(len(project.getPosts())))
-    print('===')"""
-    print('Notifications:')
-    notifs = user.notifications
-    for notif in notifs:
-        print(notif)
+    project = user.getProject('vallerie')
+    blocks = [
+        MarkdownBlock('images are now working!!! so say hello to pybug. as per the previous post, little code screenie as well - the library reads from a location on disk, so you just tell it the filename and it uploads 😄'),
+        MarkdownBlock('there isnt error checking though so who knows if you try uploading an 11mb file. maybe eggbug cries.'),
+        MarkdownBlock('also i might add a special attachment block just for pybug. incase you just want to include pybug. let him spread his little snake wings.'),
+        AttachmentBlock('pybug.png'),
+        AttachmentBlock('screenshot.png'),
+    ]
+    p = project.post('images are now working in cohost.py!!',
+                     blocks,
+                     adult=False, draft=False, tags=['cohost.py', 'python', 'drafts are still WIP because i cannot figure out what the API endpoint for the life of me'])
+    print('Live at: {}'.format(p.url))
+    
 
 if __name__ == '__main__':
     main()

@@ -6,6 +6,7 @@ from cohost.models.notification import buildFromNotifList
 import hashlib
 import base64
 
+
 class User:
     def __init__(self, cookie) -> None:
         self.cookie = cookie
@@ -50,8 +51,7 @@ class User:
     @property
     def editedProjectsRaw(self) -> dict:
         return fetchTrpc('projects.listEditedProjects', self.cookie)['result']['data']['projects']
-    
-    
+
     """Fetch data from the API about projects the user can edit
     
     Returns:
@@ -97,6 +97,14 @@ class User:
         # If this didn't error out, we're good!
         return u
 
+    def getProject(self, handle: str) -> EditableProject:
+        # Retrieve a project that you can edit
+        projects = self.editedProjects
+        for project in projects:
+            if project.handle == handle:
+                return project
+        return None
+
     def resolveSecondaryProject(self, projectData):
         from cohost.models.project import Project, EditableProject
         editableProjects = self.editedProjects
@@ -112,6 +120,8 @@ class User:
             'limit': 5000
         }, generate_login_cookies(self.cookie))
         return buildFromNotifList(nJson, self)
+
+
 """
 
 def getProjects() {
