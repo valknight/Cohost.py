@@ -87,3 +87,10 @@ If you think one of these should be implemented, please file a GitHub issue with
 ## Follow me on Cohost!
 
 [hello is me](https://cohost.org/vallerie)
+
+## Thanks
+
+[cohost.js](https://github.com/mogery/cohost.js/) - provided a good point to start looking at how to go about this, and how cohost works in fundamental aspects. also has a working login thing which i need to properly understand at some point
+[cohost.org](https://cohost.org) - home of eggbug
+[requests](https://requests.readthedocs.io/en/latest/) - i would be lost in python if it weren't for requests, my beloved
+the random tumblr anon who sent me an activation link - thanks
