@@ -25,7 +25,7 @@ print('Check out your post at {}'.format(newPost.url))
 ## Getting started
 
 1. Have an activated Cohost.org account. This entire library will probably explode if you use it with an unactivated account, and it defo isn't some bypass.
-2. Install library with `(@val do pypi)`
+2. Install library with `pip install cohost`
 3. Retrieve your token (see below!)
 4. Import data models you require, and go from there!
 

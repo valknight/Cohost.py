@@ -1,7 +1,3 @@
-from curses.ascii import US
-
-from numpy import block
-import cohost
 from cohost.network import fetchTrpc, fetch, generate_login_cookies
 from cohost.models.post import Post
 from cohost.models.block import Block, AttachmentBlock
