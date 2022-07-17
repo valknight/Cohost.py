@@ -5,7 +5,14 @@
 
 A python library for Cohost!
 
+## Hyperstart
+
+> `pip install cohost`
+
 ## Quickstart
+
+> `pip install cohost`
+
 ```python3
 from cohost.models.user import User
 from cohost.models.block import AttachmentBlock, MarkdownBlock
