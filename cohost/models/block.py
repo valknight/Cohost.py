@@ -54,6 +54,8 @@ class AttachmentBlock(Block):
             content_type = 'image/jpeg'
         elif self.filename.lower().endswith('.png'):
             content_type = 'image/png'
+        elif self.filename.lower().endswith('.svg'):
+            content_type = 'image/svg+xml'
         self.content_type = content_type
         with open(self.filepath, 'rb') as f:
             content_length = len(f.read())
@@ -64,7 +66,7 @@ class AttachmentBlock(Block):
     def dict(self) -> dict:
         aid = self.attachment_id
         if self.attachment_id is None:
-            aid = ""
+            aid = "00000000-0000-0000-0000-000000000000"
         return {
             'type': 'attachment',
             'attachment': {
