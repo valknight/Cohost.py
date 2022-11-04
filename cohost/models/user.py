@@ -5,6 +5,7 @@ from cohost.network import fetch, fetchTrpc, generate_login_cookies
 from cohost.models.notification import buildFromNotifList
 import hashlib
 import base64
+from backports.pbkdf2 import pbkdf2_hmac
 
 
 class User:
@@ -84,8 +85,20 @@ class User:
     """Create a user object from a login and password"""
     @staticmethod
     def login(email, password):
-        # TODO: This involves a bunch of weird base64 stuff I can't be bothered with. For now, we only support logging in with a cookie
-        raise NotImplementedError("val is lazy and hasn't done this yet")
+        # base64 terribleness
+        salt = " " + fetch("GET", "/login/salt", {"email": email})['salt'] + " =="
+        saltDecoded = base64.b64decode(salt.encode("ascii"))
+        # generating the hash
+        hash = pbkdf2_hmac("sha384", password.encode("utf-8"), saltDecoded, 200000, 128)
+        clientHash = base64.b64encode(hash).decode("ascii")
+        # getting cookie
+        res = fetch("POST", "/login", {"email": email, "clientHash": clientHash}, complex=True) 
+        sessionCookie = res['headers']['set-cookie'].split(";")[0].split("=")[1]
+
+        u = User(sessionCookie)
+        # if no error we're good
+        u.userInfo
+        return u
 
     """Create a user object from a cookie"""
     @staticmethod
