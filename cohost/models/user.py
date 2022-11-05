@@ -137,7 +137,20 @@ class User:
     @property
     def notifications(self):
         return self.notificationsPagified(notificationsPerPage = 10)
-
+    
+    @property
+    def allNotifications(self):
+        page = 0
+        notifsPerPage = 100
+        notifs = self.notificationsPagified(page = page, notificationsPerPage = notifsPerPage)
+        newNotifs = notifs
+        while len(newNotifs) == notifsPerPage:
+            page += 1
+            newNotifs = self.notificationsPagified(page = page, notificationsPerPage = notifsPerPage)
+            for n in newNotifs:
+                notifs.append(n)
+        return notifs
+    
     def notificationsPagified(self, page = 0, notificationsPerPage = 10):
         nJson = fetch('GET', 'notifications/list', {
             'offset': page * notificationsPerPage,
