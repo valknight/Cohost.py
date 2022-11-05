@@ -87,6 +87,7 @@ class User:
     def login(email, password):
         # base64 terribleness
         salt = fetch("GET", "/login/salt", {"email": email})['salt']
+        # explanation for whatever this is by @iliana - https://cohost.org/iliana/post/180187-eggbug-rs-v0-1-3-d
         salt = salt.replace('-', 'A')
         salt = salt.replace('_', 'A')
         salt = salt + "=="
