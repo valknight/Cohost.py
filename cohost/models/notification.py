@@ -38,6 +38,8 @@ class Comment(BaseNotification):
         self.inReplyTo = inReplyTo
 
     def __str__(self) -> str:
+        if self.toPost == None:
+            return "{} commented on [post that couldn't be retrieved] - \"{}\" | {}".format(self.fromProject.handle, self.comment.body, self.timestamp)
         return "{} commented on {} - \"{}\" | {}".format(self.fromProject.handle, self.toPost.postId, self.comment.body, self.timestamp)
 
 class Follow(BaseNotification):
@@ -85,6 +87,8 @@ def buildFromNotifList(notificationsApiResp: dict, user):
     comments = []
     while len(commentQueue) > 0:
         nextNotif = commentQueue.pop(0)
+        if nextNotif.get('attemptsToProcess', 0) == 0:
+            nextNotif['attemptsToProcess'] = 0
         replyComment = None
         if nextNotif['comment']['inReplyTo']:
             found = False
@@ -94,7 +98,8 @@ def buildFromNotifList(notificationsApiResp: dict, user):
                     replyComment = n
                     break
             # we still have other notifications to be processed
-            if not found and len(commentQueue) > 0:
+            nextNotif['attemptsToProcess'] += 1
+            if not found and len(commentQueue) > 0 and not(nextNotif['attemptsToProcess'] > 50):
                 commentQueue.append(nextNotif)
                 continue
         # Ok, sick, so, we either don't have a reply, or we do but it's already processed!
