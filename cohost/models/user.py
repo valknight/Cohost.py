@@ -86,19 +86,26 @@ class User:
     @staticmethod
     def login(email, password):
         # base64 terribleness
-        salt = " " + fetch("GET", "/login/salt", {"email": email})['salt'] + " =="
+        salt = fetch("GET", "/login/salt", {"email": email})['salt']
+        salt = salt.replace('-', 'A')
+        salt = salt.replace('_', 'A')
+        salt = salt + "=="
+
         saltDecoded = base64.b64decode(salt.encode("ascii"))
+
         # generating the hash
         hash = pbkdf2_hmac("sha384", password.encode("utf-8"), saltDecoded, 200000, 128)
         clientHash = base64.b64encode(hash).decode("ascii")
+
         # getting cookie
         res = fetch("POST", "/login", {"email": email, "clientHash": clientHash}, complex=True) 
         sessionCookie = res['headers']['set-cookie'].split(";")[0].split("=")[1]
-
+        
         u = User(sessionCookie)
         # if no error we're good
         u.userInfo
         return u
+
 
     """Create a user object from a cookie"""
     @staticmethod
