@@ -58,9 +58,8 @@ def main():
     user = User.login(username, password)
     project = user.getProject(handle)
     newPost = project.post('new release of cohost.py for all your automated Chostin\'!',
-      blocks, tags=['cohost.py', 'python', 'development', 'cohost api'], draft=True)
-
-    #print('Check out your post at {}'.format(newPost.url))
+      blocks, tags=['cohost.py', 'python', 'development', 'cohost api'], draft=False)
+    print('Check out your post at {}'.format(newPost.url))
 
 if __name__ == '__main__':
     main()
