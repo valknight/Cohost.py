@@ -5,11 +5,11 @@ name = "pypi"
 
 [packages]
 requests = "*"
-hashlib = "*"
+"backports.pbkdf2" = "*"
 
 [dev-packages]
 "flake8" = "*"
 pytest = "*"
 
 [requires]
-python_version = "3.7"
+python_version = "3.11"
