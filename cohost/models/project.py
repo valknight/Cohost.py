@@ -193,6 +193,54 @@ class EditableProject(Project):
             return self.getPosts()[0]  # this will be what we just posted
         return None # TODO: Get drafts working!
 
+    def editPost(self, postId: int, headline: str, blocks: list, cws: list = [], tags: list = [], adult: bool = False, draft = False):
+        # same thing as post() but initial request is a PUT to project/{handle}/posts/{postId}
+
+        blockL = []
+        attachments = []
+        for b in blocks:
+            if type(b) is AttachmentBlock:
+                attachments.append(b) # type: AttachmentBlock
+            else:
+                blockL.append(b.dict)
+        
+        for attachment in attachments:
+            blockL.insert(0, attachment.dict)
+        postData = {
+            'postState': int(not(draft) and (len(attachments) == 0)),
+            'headline': headline,
+            'adultContent': adult,
+            'blocks': blockL,
+            'cws': cws,
+            'tags': tags
+        }
+        req = fetch('put', '/project/{}/posts/{}'.format(self.handle, postId), postData,
+                    generate_login_cookies(self.user.cookie))
+        if len(attachments) == 0 and not(draft):
+            return self.getPosts()[0]  # this will be what we just posted
+        if len(attachments) == 0:
+            return None # TODO: Get drafts working!
+        # OK so, we can now feed each attachment block our post ID
+        for attachment in attachments:
+            attachment.uploadIfNot(postId, self)
+        # Sick! Everything is uploaded - we can now rebuild the post data and send it back to cohost
+        blockL = []
+        for b in blocks:
+            blockL.append(b.dict)
+        postData = {
+            'postState': int(not(draft)),
+            'headline': headline,
+            'adultContent': adult,
+            'blocks': blockL,
+            'cws': cws,
+            'tags': tags
+        }
+        req = fetch('put', '/project/{}/posts/{}'.format(self.handle, req['postId']), postData,
+                    generate_login_cookies(self.user.cookie))
+        if not draft:
+            return self.getPosts()[0]  # this will be what we just posted
+        return None # TODO: Get drafts working!
+        
     @staticmethod
     def create(user, projectName, private: bool = False, adult: bool = False) -> Project:
         raise NotImplemented(
