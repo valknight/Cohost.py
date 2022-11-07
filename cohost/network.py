@@ -47,7 +47,7 @@ def fetch(method: str, endpoint, data: dict, cookies="", complex=False):
     try:
         res = req.json()
     except:
-        res = req.text()
+        res = req.text
 
     if (req.status_code >= 400 and method != 'put'):
         raise Exception(res)
