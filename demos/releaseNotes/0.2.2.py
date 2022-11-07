@@ -44,12 +44,14 @@ def main():
         MarkdownBlock(generateDangerNote("If you're making a bot, please honor [@jkap's little notes on bots](https://cohost.org/jkap/post/201002-small-request-that-i)! And, as always, don't make this site awful :)")),
         MarkdownBlock('<hr>'),
         MarkdownBlock('want a code sample? sure! attachment block with alt-text:<br>`AttachmentBlock("eggbug.png", alt_text="a friend")`'),
-        MarkdownBlock('for a full example, check out <a href="https://github.com/valknight/Cohost.py/blob/main/demos/releaseNotes/0.2.2.py">the source for this post</a>')
+        MarkdownBlock('for a full example, check out <a href="https://github.com/valknight/Cohost.py/blob/main/demos/releaseNotes/0.2.2.py">the source for this post</a>'),
+        MarkdownBlock("<hr>"),
+        MarkdownBlock('<small><i>note: you do not need to shoot yourself into outer space to use cohost.py, or to add alt-text to your images. do not fire real pybugs into space.</i></small>')
     ]
     # woah !!! logging in !!! that's so cool !!!
     user = User.login(username, password)
     project = user.getProject(handle)
-    newPost = project.post('new release of cohost.py for all your automated Chostin\'!',
+    newPost = project.post('cohost.py has arrived at alt-text planet!',
       blocks, tags=['cohost.py', 'python', 'development', 'cohost api'], draft=False)
     print('Check out your post at {}'.format(newPost.url))
 
