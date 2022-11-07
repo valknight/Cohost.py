@@ -38,7 +38,7 @@ class MarkdownBlock(Block):
 class AttachmentBlock(Block):
     """A block that contains an attachment"""
 
-    def __init__(self, filepath: str, attachment_id: str = None) -> None:
+    def __init__(self, filepath: str, attachment_id: str = None, alt_text=None) -> None:
         try:
             with open(filepath, 'rb') as f:
                 f.read()
@@ -61,18 +61,22 @@ class AttachmentBlock(Block):
             content_length = len(f.read())
         self.content_length = content_length
         self.attachment_id = attachment_id
+        self.alt_text = alt_text
 
     @property
     def dict(self) -> dict:
         aid = self.attachment_id
         if self.attachment_id is None:
             aid = "00000000-0000-0000-0000-000000000000"
-        return {
+        toReturn = {
             'type': 'attachment',
             'attachment': {
                 'attachmentId': aid
             }
         }
+        if self.alt_text:
+            toReturn['attachment']['altText'] = self.alt_text
+        return toReturn
     
     def uploadIfNot(self, postId, project):
         if self.attachment_id is not None:
