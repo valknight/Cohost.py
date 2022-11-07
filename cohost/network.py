@@ -8,6 +8,11 @@ l.setLevel(logging.DEBUG)
 API_BASE = "https://cohost.org/api/v1"
 
 cache = {}
+
+headers = {
+    'User-Agent': 'cohost.py'
+}
+
 timeout = 30
 
 
@@ -32,13 +37,13 @@ def fetch(method: str, endpoint, data: dict, cookies="", complex=False):
     url = API_BASE + endpoint
     l.debug('{} to {}'.format(method, url))
     if method.lower() == "get":
-        req = requests.get(url, cookies=cookies, params=data)
+        req = requests.get(url, cookies=cookies, params=data, headers=headers)
     elif method.lower() == "post":
-        req = requests.post(url, cookies=cookies, data=data)
+        req = requests.post(url, cookies=cookies, data=data, headers=headers)
     elif method.lower() == 'postjson':
-        req = requests.post(url, cookies=cookies, json=data)
+        req = requests.post(url, cookies=cookies, json=data, headers=headers)
     elif method.lower() == 'put':
-        req = requests.put(url, cookies=cookies, json=data)
+        req = requests.put(url, cookies=cookies, json=data, headers=headers)
     else:
         l.error('No such method handled: ' + method)
         l.error('Defaulting to get')
@@ -47,7 +52,7 @@ def fetch(method: str, endpoint, data: dict, cookies="", complex=False):
     try:
         res = req.json()
     except:
-        res = req.text()
+        res = req.text
 
     if (req.status_code >= 400 and method != 'put'):
         raise Exception(res)
