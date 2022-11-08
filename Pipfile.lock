@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "5bbeb2d7dc71a75019eddeff9169245746943380dd74fc0a6c43c711d8f91938"
+            "sha256": "cac45fdc7d0842968c158ce32bbb7a636dfff4dc144688abdb0bb4df30084b8a"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -16,13 +16,6 @@
         ]
     },
     "default": {
-        "backports.pbkdf2": {
-            "hashes": [
-                "sha256:6d342adb73dd86396b7c604f6da473bf98eb5356e68b99c913a30a5e64832e03"
-            ],
-            "index": "pypi",
-            "version": "==0.1"
-        },
         "certifi": {
             "hashes": [
                 "sha256:0d9c601124e5a6ba9712dbc60d9c53c21e34f5f641fe83002317394311bdce14",

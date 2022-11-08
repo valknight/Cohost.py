@@ -27,7 +27,7 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     python_requires=">=3.7.*",
-    install_requires=['requests','backports.pbkdf2'],
+    install_requires=['requests'],
     license=about['__license__'],
     zip_safe=False,
     classifiers=[

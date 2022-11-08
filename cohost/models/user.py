@@ -3,9 +3,8 @@ from re import U
 from cohost.models.project import EditableProject
 from cohost.network import fetch, fetchTrpc, generate_login_cookies
 from cohost.models.notification import buildFromNotifList
-import hashlib
+from hashlib import pbkdf2_hmac
 import base64
-from backports.pbkdf2 import pbkdf2_hmac
 
 
 class User:
