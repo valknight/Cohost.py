@@ -105,7 +105,7 @@ class EditableProject(Project):
                 return project
         return None
 
-    def post(self, headline: str, blocks: list, cws: list = [], tags: list = [], adult: bool = False, draft = False):
+    def post(self, headline: str, blocks: list = [], cws: list = [], tags: list = [], adult: bool = False, draft = False):
         # Basic flow: you send a POST to project/{handle}/posts
         # This gives us back a post ID, as well as a API link
         # For example:
