@@ -1,9 +1,9 @@
-from cohost.models.user import User
-from cohost.models.post import Post
-from cohost.models.block import AttachmentBlock, MarkdownBlock
-from cohost.models.project import Project, EditableProject
 import os
-import json
+
+from cohost.models.block import AttachmentBlock, MarkdownBlock
+from cohost.models.user import User
+
+
 def main():
     cookie = os.environ.get('COHOST_COOKIE')
     if cookie is None:

@@ -51,9 +51,9 @@ class Follow(BaseNotification):
 
 
 def buildFromNotifList(notificationsApiResp: dict, user):
-    from cohost.models.user import User
-    from cohost.models.post import Post
     from cohost.models.comment import Comment as CommentModel
+    from cohost.models.post import Post
+    from cohost.models.user import User
     u = user  # type: User
     user = u  # this whole shitshow is to get intellisense working without circular imports
     # I Love Python

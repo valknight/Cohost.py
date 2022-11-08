@@ -1,10 +1,9 @@
-from distutils.command.build import build
-from re import U
+import base64
+from hashlib import pbkdf2_hmac
+
+from cohost.models.notification import buildFromNotifList
 from cohost.models.project import EditableProject
 from cohost.network import fetch, fetchTrpc, generate_login_cookies
-from cohost.models.notification import buildFromNotifList
-from hashlib import pbkdf2_hmac
-import base64
 
 
 class User:
@@ -126,7 +125,7 @@ class User:
         return None
 
     def resolveSecondaryProject(self, projectData):
-        from cohost.models.project import Project, EditableProject
+        from cohost.models.project import EditableProject, Project
         editableProjects = self.editedProjects
         for project in editableProjects:
             if project.projectId == projectData['projectId']:

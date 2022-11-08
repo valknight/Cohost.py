@@ -1,8 +1,6 @@
-
-from fileinput import filename
 import requests
+
 from cohost.network import fetch, generate_login_cookies
-import os
 
 
 class Block:
