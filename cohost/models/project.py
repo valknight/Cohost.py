@@ -1,6 +1,7 @@
-from cohost.network import fetchTrpc, fetch, generate_login_cookies
+from cohost.models.block import AttachmentBlock
 from cohost.models.post import Post
-from cohost.models.block import Block, AttachmentBlock
+from cohost.network import fetch, generate_login_cookies
+
 # from cohost.models.user import User
 
 

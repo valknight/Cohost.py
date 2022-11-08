@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-
 import os
-from setuptools import setup, find_packages
+
+from setuptools import find_packages, setup
 
 # get key package details from py_pkg/__version__.py
 about = {}  # type: ignore

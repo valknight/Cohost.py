@@ -1,7 +1,7 @@
-from distutils.log import debug
-import requests
 import logging
 import time
+
+import requests
 
 l = logging.getLogger(__name__)
 l.setLevel(logging.DEBUG)
