@@ -7,6 +7,12 @@ class Post:
 
     def __str__(self) -> str:
         return "{}".format(self.filename)
+    
+    def edit(self, headline: str, blocks: list = [], cws: list = [], tags: list = [], adult: bool = False, draft = False):
+        from cohost.models.project import EditableProject
+        if type(self.project) != EditableProject:
+            raise AttributeError("Post isn't attached to an EditableProject - do you have Edit permissions for this post?")
+        return self.project.editPost(self.postId, headline=headline, blocks=blocks, cws=cws, tags=tags, adult=adult, draft=draft)
 
     @property
     def postId(self):
