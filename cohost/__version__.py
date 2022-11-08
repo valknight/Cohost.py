@@ -7,7 +7,7 @@ Information about the current version of the package
 
 __title__ = 'cohost'
 __description__ = 'Unofficial Python API for Cohost.org - the fourth website!'
-__version__ = '0.2.3'
+__version__ = '0.2.4'
 __author__ = 'Val Knight'
 __author_email__ = 'val@valknight.xyz'
 __license__ = 'MIT'
