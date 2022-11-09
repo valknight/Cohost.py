@@ -17,8 +17,7 @@ fi
 ./venv/bin/python -m pip install --upgrade wheel
 ./venv/bin/python -m pip install --upgrade twine
 
-./venv/bin/python setup.py sdist
-./venv/bin/python setup.py bdist_wheel
+./venv/bin/python -m build
 
 cd dist/
 
