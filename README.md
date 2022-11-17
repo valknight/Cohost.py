@@ -20,7 +20,7 @@ cookie = 'yourCookie'
 user = User.loginWithCookie(cookie)
 # Alternatively: use a username/password combo
 # import os
-# user = User.login(os.getenv("COHOST_USER"), os.getenv("COHOST_PASS")
+# user = User.login(os.getenv("COHOST_USER"), os.getenv("COHOST_PASS"))
 
 for project in user.editedProjects:
     print(project) # Print all pages you have edit permissions for
