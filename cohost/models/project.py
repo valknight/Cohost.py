@@ -70,6 +70,25 @@ class Project:
     @property
     def projectInfo(self) -> str:
         return self.data
+    
+    @property
+    def atomFeed(self) -> str:
+        # TODO: This is a bad assumption, and cohost gives us a rel= link we should use instead
+        # However, to get this exposed in our API asap, this works
+        return "https://cohost.org/{}/rss/public.atom".format(self.handle)
+
+    @property
+    def rssFeed(self) -> str:
+        # Cohost's feeds aren't "RSS" but actually the atom format
+        # Most RSS readers will just call this RSS though, so, you *should* be fine but it's good to note the difference & technicality
+        # See for more information: http://www.intertwingly.net/wiki/pie/Rss20AndAtom10Compared
+        return self.atomFeed
+
+    @property
+    def jsonFeed(self) -> str:
+        # See above note in relation to the rssFeed method
+        return "https://cohost.org/{}/rss/public.json".format(self.handle)
+    
 
     def getPostsRaw(self, page=0):
         return fetch('get',
