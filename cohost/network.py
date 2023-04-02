@@ -64,7 +64,7 @@ def fetch(method: str, endpoint, data: dict, cookies="", complex=False):
     return res
 
 
-def fetchTrpc(methods: list, cookie: str):
+def fetchTrpc(methods: list, cookie: str, data: dict = None, methodType = "get"):
     global cache
     """Fetch data from trpc API
 
@@ -79,11 +79,11 @@ def fetchTrpc(methods: list, cookie: str):
         m = methods
     else:
         m = ','.join(methods)
-    data = get_cache_data(cookie, m)
-    if data is not None:
+    cacheData = get_cache_data(cookie, m)
+    if cacheData is not None:
         l.debug('Cache hit!')
-        return data
-    data = fetch("get", "/trpc/{}".format(m), None,
+        return cacheData
+    data = fetch(methodType, "/trpc/{}".format(m), data=data,
                  cookies=generate_login_cookies(cookie))
     set_cache_data(cookie, m, data)
     return data
