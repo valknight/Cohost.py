@@ -49,6 +49,34 @@ class Follow(BaseNotification):
     def __str__(self) -> str:
         return "{} is now following you | {}".format(self.fromProject.handle, self.timestamp)
 
+"""Unwrap a raw notification list's grouped notifications
+"""
+def unwrapGroupedNotifications(notificationsRaw: dict):
+    unwrapped = []
+    # Unwrap any grouped notifications
+    for notif in notificationsRaw:
+        if not notif['type'].startswith('grouped'):
+            unwrapped.append(notif)
+            continue
+        # Ok, this is guaranteed to be wrapped
+        for i in range(0, len(notif['fromProjectIds'])):
+            fromProjectId = notif['fromProjectIds'][i]
+            # If this is None, this means the code later will ignore it
+            relationshipId = None
+            sharePostId = None
+            if notif['type'] == 'groupedLike':
+                relationshipId = notif['relationshipIds'][i]
+            if notif['type'] == 'groupedShare':
+                sharePostId = notif['sharePostIds'][i]
+            unwrapped.append({
+                'type': notif['type'].replace('grouped', '').lower(),
+                'fromProjectId': fromProjectId,
+                'relationshipId': relationshipId,
+                'sharePostId': sharePostId,
+                'createdAt': notif['createdAt'],
+                'transparentShare': notif.get('transparentShare', None)
+            })
+    return unwrapped
 
 def buildFromNotifList(notificationsApiResp: dict, user):
     from cohost.models.comment import Comment as CommentModel
@@ -111,6 +139,8 @@ def buildFromNotifList(notificationsApiResp: dict, user):
         c = CommentModel(nextNotif['canEdit'], nextNotif['canInteract'],
                          nextNotif, posterProject, user, replyComment)
         comments.append(c)
+    # Unwrap grouped notifications - a "grouped" notif will cause breaking behaviour to older tools
+    notificationsRaw = unwrapGroupedNotifications(notificationsRaw)
     # and NOW we can finally map our notifications to all of our data models
     # TODO: Build notification model
     notifications = []
