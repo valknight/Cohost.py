@@ -150,12 +150,14 @@ class User:
         return notifs
     
     def notificationsPagified(self, page = 0, notificationsPerPage = 10):
-        nJson = fetch('GET', 'notifications/list', {
+        nJson = self.notificationsRaw(page, notificationsPerPage)
+        return buildFromNotifList(nJson, self)
+    
+    def notificationsRaw(self, page = 0, notificationsPerPage = 10):
+        return fetch('GET', 'notifications/list', {
             'offset': page * notificationsPerPage,
             'limit': notificationsPerPage
         }, generate_login_cookies(self.cookie))
-        return buildFromNotifList(nJson, self)
-
 
 """
 
