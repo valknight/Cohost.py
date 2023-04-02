@@ -1,6 +1,6 @@
 from cohost.models.block import AttachmentBlock
 from cohost.models.post import Post
-from cohost.network import fetch, generate_login_cookies
+from cohost.network import fetch, generate_login_cookies, fetchTrpc
 
 # from cohost.models.user import User
 
@@ -260,7 +260,14 @@ class EditableProject(Project):
         if not draft:
             return self.getPosts()[0]  # this will be what we just posted
         return None # TODO: Get drafts working!
-        
+    
+    """Set this project as the default project, for actions such as retrieving notifications
+    """
+    def switch(self):
+        fetchTrpc('projects.switchProject', self.user.cookie, {
+            "projectId":self.projectId
+        }, methodType="postjson")
+    
     @staticmethod
     def create(user, projectName, private: bool = False, adult: bool = False) -> Project:
         raise NotImplemented(
