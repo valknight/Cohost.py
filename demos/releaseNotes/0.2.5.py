@@ -52,8 +52,7 @@ def main():
     # woah !!! logging in !!! that's so cool !!!
     user = User.login(username, password)
     project = user.getProject(handle)
-    newPost = project.post('cohost.py lets you change your mind (among other things!)',
-      blocks, tags=['cohost.py', 'python', 'development', 'cohost api'], draft=False)
+    newPost = project.post('little updates to cohost.py :D', blocks, tags=['cohost.py', 'python', 'development', 'cohost api'], draft=False)
     print('Check out your post at {}'.format(newPost.url))
 
 if __name__ == '__main__':
