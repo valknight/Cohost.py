@@ -13,7 +13,10 @@ def main():
     if handle is None:
         handle = input('handle: ')
     user = User.login(username, password)
-    
+    print('getting project...')
+    project = user.getProject(handle)
+    print('switching active project...')
+    project.switch()
     print('done!', end='\n\n')
     # get last 10 notifications
     print('last 10 notifs: {}'.format(len(user.notifications)), end='\n\n')
