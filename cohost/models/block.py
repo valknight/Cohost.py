@@ -85,10 +85,10 @@ class AttachmentBlock(Block):
             project.handle, postId)
 
         # example data: filename=VxwLMgKF_400x400.jpg&content_type=image%2Fjpeg&content_length=20829
-        dospacecreds = fetch('post', endpoint, {
+        dospacecreds = fetch('postjson', endpoint, {
             'filename': self.filename,
             'content_type': self.content_type,
-            'content_length': self.content_length
+            'content_length': int(self.content_length)
         }, generate_login_cookies(project.user.cookie))
         # Step 2: ok sick, we now have digitalocean creds to upload the image to Spaces
         # we need to use raw requests here, as we're not actually talking to cohost
