@@ -7,7 +7,7 @@ name = "cohost"
 version = "0.2.6"
 description = "Unofficial Python API wrapper for Cohost.org - the fourth website!"
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.9"
 license = { file = "LICENSE" }
 keywords = [ "cohost.org", "cohost", "api" ]
 classifiers = [
