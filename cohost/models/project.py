@@ -2,12 +2,11 @@ from cohost.models.block import AttachmentBlock
 from cohost.models.post import Post
 from cohost.network import fetch, generate_login_cookies, fetchTrpc
 
-# from cohost.models.user import User
-
 
 class Project:
     def __init__(self, user, data):
-        from cohost.models.user import User
+        # this helps editors understand what we're setting
+        from cohost.models.user import User  # noqa: F401
         self.user = user  # type: User
         # we can't specify this type globally due to all kinds of import errors
         # but that gives us our login chain back, if that makes sense!
@@ -70,25 +69,28 @@ class Project:
     @property
     def projectInfo(self) -> str:
         return self.data
-    
+
     @property
     def atomFeed(self) -> str:
-        # TODO: This is a bad assumption, and cohost gives us a rel= link we should use instead
+        # TODO: This is a bad assumption
+        # Cohost gives us a rel=link we should use instead
         # However, to get this exposed in our API asap, this works
         return "https://cohost.org/{}/rss/public.atom".format(self.handle)
 
     @property
     def rssFeed(self) -> str:
         # Cohost's feeds aren't "RSS" but actually the atom format
-        # Most RSS readers will just call this RSS though, so, you *should* be fine but it's good to note the difference & technicality
-        # See for more information: http://www.intertwingly.net/wiki/pie/Rss20AndAtom10Compared
+        # Most RSS readers will just call this RSS though
+        # As such, you *should* be fine
+        # But! it's good to note the difference & technicality
+        # See for more information
+        # http://www.intertwingly.net/wiki/pie/Rss20AndAtom10Compared
         return self.atomFeed
 
     @property
     def jsonFeed(self) -> str:
         # See above note in relation to the rssFeed method
         return "https://cohost.org/{}/rss/public.json".format(self.handle)
-    
 
     def getPostsRaw(self, page=0):
         return fetch('get',
@@ -104,12 +106,9 @@ class Project:
         return posts
 
 
-"""Project but using live API data, instead of prefilled data. Intended for use in editable projects!"""
-
-
 class EditableProject(Project):
     def __init__(self, user, projectId):
-        from cohost.models.user import User
+        from cohost.models.user import User  # noqa: F401
         self.user = user  # type: User
         # we can't specify this type globally due to all kinds of import errors
         # but that gives us our login chain back, if that makes sense!
@@ -125,7 +124,8 @@ class EditableProject(Project):
                 return project
         return None
 
-    def post(self, headline: str, blocks: list = [], cws: list = [], tags: list = [], adult: bool = False, draft = False):
+    def post(self, headline: str, blocks: list = [], cws: list = [],
+             tags: list = [], adult: bool = False, draft=False):
         # Basic flow: you send a POST to project/{handle}/posts
         # This gives us back a post ID, as well as a API link
         # For example:
@@ -141,18 +141,20 @@ class EditableProject(Project):
         ]
         }
         """
-        # Then, if you have images, upload then by sending data *about* the image to project/{handle}/posts/{postId}/attach/start
+        # Then, if you have images:
+        # Upload them by sending data *about* the image to
+        #   project/{handle}/posts/{postId}/attach/start
         # This will respond back with something like...
         """
         {
-            "attachmentId": "25ecb155-9937-4b87-b1b3-bd70a6be3bbc",
+            "attachmentId": "yourattachmentid",
             "url": "https://sfo3.digitaloceanspaces.com/redcent-dev",
             "requiredFields": {
                 "acl": "public-read",
                 "Content-Type": "image/webp",
                 "Content-Disposition": "inline",
                 "Cache-Control": "max-age=31536000",
-                "key": "attachment/25ecb155-9937-4b87-b1b3-bd70a6be3bbc/SleepFaceIcon.webp",
+                "key": "attachment/yourattachmentid/foo.webp",
                 "bucket": "redcent-dev",
                 "X-Amz-Algorithm": "...",
                 "X-Amz-Credential": "...",
@@ -162,113 +164,145 @@ class EditableProject(Project):
         }
         """
         # We can THEN send the image to DO spaces, using the credentials
-        # Once this is uploaded, we can tell cohost the upload is finished by sending another POST to project/{handle}/posts/{id}/attach/finish/{attachmentId}
-        # after ALL of this we sent a PUT (what a change) request to project/{handle}/posts/{postId}
-        # the body of this is the same as what we initially POST'd, but, now, we replace the initial blank attachmentId with the corresponding one back. The only catch is change postState to 1, instead of zero
-        # (postState refers to if the post should be public - if it is zero, it will only exist as a draft)
-        # TODO: Implement the image upload stuff within AttachmentBlock - it should handle all of this
-        # For now though, we'll just send the initial post as that's good enough for text!
+        # Once this is uploaded, we can tell cohost the upload is finished
+        # We do this by sending another POST to the following URL:
+        #   project/{handle}/posts/{id}/attach/finish/{attachmentId}
+        # After ALL of this we sent a PUT (what a change) request to:
+        #   project/{handle}/posts/{postId}
+        # the body of this is the same as what we initially POST'd, but -
+        # now, we replace the blank attachmentId
+        # We do this with the corresponding one we got back
+        # The only catch is change postState to 1, instead of zero
+        # postState refers to if the post should be public
+        # if it is zero, it will only exist as a draft
         blockL = []
         attachments = []
         for b in blocks:
             if type(b) is AttachmentBlock:
-                attachments.append(b) # type: AttachmentBlock
+                attachments.append(b)  # type: AttachmentBlock
             else:
                 blockL.append(b.dict)
-        
+
         for attachment in attachments:
             blockL.insert(0, attachment.dict)
         postData = {
-            'postState': int(not(draft) and (len(attachments) == 0)),
+            'postState': int((not draft) and (len(attachments) == 0)),
             'headline': headline,
             'adultContent': adult,
             'blocks': blockL,
             'cws': cws,
             'tags': tags
         }
-        req = fetch('postJSON', '/project/{}/posts'.format(self.handle), postData,
-                    generate_login_cookies(self.user.cookie))
-        if len(attachments) == 0 and not(draft):
+        req = fetch(
+            'postJSON',
+            '/project/{}/posts'.format(self.handle),
+            postData,
+            generate_login_cookies(self.user.cookie)
+        )
+        if len(attachments) == 0 and (not draft):
             return self.getPosts()[0]  # this will be what we just posted
         if len(attachments) == 0:
-            return None # TODO: Get drafts working!
+            return None  # TODO: Get drafts working!
         # OK so, we can now feed each attachment block our post ID
         for attachment in attachments:
             attachment.uploadIfNot(req['postId'], self)
-        # Sick! Everything is uploaded - we can now rebuild the post data and send it back to cohost
+        # Sick! Everything is uploaded
+        # We can now rebuild the post data and send it back to cohost
         blockL = []
         for b in blocks:
             blockL.append(b.dict)
         postData = {
-            'postState': int(not(draft)),
+            'postState': int(not draft),
             'headline': headline,
             'adultContent': adult,
             'blocks': blockL,
             'cws': cws,
             'tags': tags
         }
-        req = fetch('put', '/project/{}/posts/{}'.format(self.handle, req['postId']), postData,
-                    generate_login_cookies(self.user.cookie))
+        req = fetch(
+            'put',
+            '/project/{}/posts/{}'.format(self.handle, req['postId']),
+            postData,
+            generate_login_cookies(self.user.cookie)
+        )
         if not draft:
             return self.getPosts()[0]  # this will be what we just posted
-        return None # TODO: Get drafts working!
+        return None  # TODO: Get drafts working!
 
-    def editPost(self, postId: int, headline: str, blocks: list, cws: list = [], tags: list = [], adult: bool = False, draft = False):
-        # same thing as post() but initial request is a PUT to project/{handle}/posts/{postId}
+    def editPost(self, postId: int,
+                 headline: str, blocks: list,
+                 cws: list = [], tags: list = [],
+                 adult: bool = False, draft=False):
+        # same thing as post() but -
+        # initial request is a PUT to project/{handle}/posts/{postId}
 
         blockL = []
         attachments = []
         for b in blocks:
             if type(b) is AttachmentBlock:
-                attachments.append(b) # type: AttachmentBlock
+                attachments.append(b)  # type: AttachmentBlock
             else:
                 blockL.append(b.dict)
-        
+
         for attachment in attachments:
             blockL.insert(0, attachment.dict)
         postData = {
-            'postState': int(not(draft) and (len(attachments) == 0)),
+            'postState': int((not draft) and (len(attachments) == 0)),
             'headline': headline,
             'adultContent': adult,
             'blocks': blockL,
             'cws': cws,
             'tags': tags
         }
-        req = fetch('put', '/project/{}/posts/{}'.format(self.handle, postId), postData,
-                    generate_login_cookies(self.user.cookie))
-        if len(attachments) == 0 and not(draft):
+        req = fetch(
+            'put',
+            '/project/{}/posts/{}'.format(self.handle, postId),
+            postData,
+            generate_login_cookies(self.user.cookie)
+        )
+        if len(attachments) == 0 and (not draft):
             return self.getPosts()[0]  # this will be what we just posted
         if len(attachments) == 0:
-            return None # TODO: Get drafts working!
+            return None  # TODO: Get drafts working!
         # OK so, we can now feed each attachment block our post ID
         for attachment in attachments:
             attachment.uploadIfNot(postId, self)
-        # Sick! Everything is uploaded - we can now rebuild the post data and send it back to cohost
+        # Sick! Everything is uploaded
+        # We can now rebuild the post data and send it back to Cohost
         blockL = []
         for b in blocks:
             blockL.append(b.dict)
         postData = {
-            'postState': int(not(draft)),
+            'postState': int(not draft),
             'headline': headline,
             'adultContent': adult,
             'blocks': blockL,
             'cws': cws,
             'tags': tags
         }
-        req = fetch('put', '/project/{}/posts/{}'.format(self.handle, req['postId']), postData,
-                    generate_login_cookies(self.user.cookie))
+        req = fetch(
+            'put',
+            '/project/{}/posts/{}'.format(self.handle, req['postId']),
+            postData,
+            generate_login_cookies(self.user.cookie)
+        )
         if not draft:
             return self.getPosts()[0]  # this will be what we just posted
-        return None # TODO: Get drafts working!
-    
-    """Set this project as the default project, for actions such as retrieving notifications
+        return None  # TODO: Get drafts working!
+
+    """Set this project as the default project
+    This applies for actions such as retrieving notifications
     """
     def switch(self):
         fetchTrpc('projects.switchProject', self.user.cookie, {
-            "projectId":self.projectId
+            "projectId": self.projectId
         }, methodType="postjson")
-    
+
     @staticmethod
-    def create(user, projectName, private: bool = False, adult: bool = False) -> Project:
-        raise NotImplemented(
-            "Can be technically implemented, but I'm choosing not to to respect cohost. I don't want bots creating tons of pages and handles to be easy to build. Sorry!")
+    def create(user, projectName, private: bool = False,
+               adult: bool = False) -> Project:
+        raise NotImplementedError(
+            """Can be technically implemented, however -
+            I'm choosing not to to respect cohost.
+            I don't want bots creating tons of pages and handles.
+            Sorry!""")

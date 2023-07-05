@@ -43,16 +43,17 @@ class User:
         return fetchTrpc('login.loggedIn', self.cookie)['result']['data']
 
     """Fetch data from the API about projets the user can edit
-    
+
     Returns:
         dict: Project dictionaries
     """
     @property
     def editedProjectsRaw(self) -> dict:
-        return fetchTrpc('projects.listEditedProjects', self.cookie)['result']['data']['projects']
+        rawResp = fetchTrpc('projects.listEditedProjects', self.cookie)
+        return rawResp['result']['data']['projects']
 
     """Fetch data from the API about projects the user can edit
-    
+
     Returns:
         list[Project]: Project objects
     """
@@ -65,7 +66,7 @@ class User:
         return projects
 
     """Get a salt for an email - for use in logging in
-    
+
 
     Returns:
         str: Base64 encoded salt
@@ -85,7 +86,8 @@ class User:
     def login(email, password):
         # base64 terribleness
         salt = fetch("GET", "/login/salt", {"email": email})['salt']
-        # explanation for whatever this is by @iliana - https://cohost.org/iliana/post/180187-eggbug-rs-v0-1-3-d
+        # explanation for whatever this is by @iliana
+        # https://cohost.org/iliana/post/180187-eggbug-rs-v0-1-3-d
         salt = salt.replace('-', 'A')
         salt = salt.replace('_', 'A')
         salt = salt + "=="
@@ -93,25 +95,29 @@ class User:
         saltDecoded = base64.b64decode(salt.encode("ascii"))
 
         # generating the hash
-        hash = pbkdf2_hmac("sha384", password.encode("utf-8"), saltDecoded, 200000, 128)
+        # the 200000 is the magic iter number - Use This, or login will break
+        hash = pbkdf2_hmac("sha384", password.encode("utf-8"), saltDecoded,
+                           200000, 128)
         clientHash = base64.b64encode(hash).decode("ascii")
 
         # getting cookie
-        res = fetch("POST", "/login", {"email": email, "clientHash": clientHash}, complex=True) 
-        sessionCookie = res['headers']['set-cookie'].split(";")[0].split("=")[1]
-        
+        res = fetch("POST", "/login",
+                    {"email": email, "clientHash": clientHash}, complex=True)
+        sessionCookie = (res['headers']['set-cookie'].
+                         split(";")[0].split("=")[1])
+
         u = User(sessionCookie)
         # if no error we're good
         u.userInfo
         return u
-
 
     """Create a user object from a cookie"""
     @staticmethod
     def loginWithCookie(cookie):
         # First, let's create a user
         u = User(cookie)
-        # Now, we need to validate functions are working - we can do this by getting the user's info
+        # Now, we need to validate functions are working
+        # We can do this by getting the user's info
         u.userInfo
         # If this didn't error out, we're good!
         return u
@@ -125,7 +131,7 @@ class User:
         return None
 
     def resolveSecondaryProject(self, projectData):
-        from cohost.models.project import EditableProject, Project
+        from cohost.models.project import Project
         editableProjects = self.editedProjects
         for project in editableProjects:
             if project.projectId == projectData['projectId']:
@@ -134,46 +140,33 @@ class User:
 
     @property
     def notifications(self):
-        return self.notificationsPagified(notificationsPerPage = 10)
-    
+        return self.notificationsPagified(notificationsPerPage=10)
+
     @property
     def allNotifications(self):
         page = 0
         notifsPerPage = 100
-        notifs = self.notificationsPagified(page = page, notificationsPerPage = notifsPerPage)
+        notifs = self.notificationsPagified(
+            page=page,
+            notificationsPerPage=notifsPerPage
+        )
         newNotifs = notifs
         while len(newNotifs) == notifsPerPage:
             page += 1
-            newNotifs = self.notificationsPagified(page = page, notificationsPerPage = notifsPerPage)
+            newNotifs = self.notificationsPagified(
+                page=page,
+                notificationsPerPage=notifsPerPage
+            )
             for n in newNotifs:
                 notifs.append(n)
         return notifs
-    
-    def notificationsPagified(self, page = 0, notificationsPerPage = 10):
+
+    def notificationsPagified(self, page=0, notificationsPerPage=10):
         nJson = self.notificationsRaw(page, notificationsPerPage)
         return buildFromNotifList(nJson, self)
-    
-    def notificationsRaw(self, page = 0, notificationsPerPage = 10):
+
+    def notificationsRaw(self, page=0, notificationsPerPage=10):
         return fetch('GET', 'notifications/list', {
             'offset': page * notificationsPerPage,
             'limit': notificationsPerPage
         }, generate_login_cookies(self.cookie))
-
-"""
-
-def getProjects() {
-    return (await fetch(
-        "GET",
-        "/projects/edited",
-        this.sessionCookie
-    )).projects.map(x => new Project(this, x));
-}
-
-def getNotifications(offset = 0, limit = 20):
-    return (await fetch(
-        "GET",
-        "/notifications/list",
-        this.sessionCookie,
-        { offset, limit }
-    ))
-"""

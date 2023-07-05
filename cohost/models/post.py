@@ -1,18 +1,28 @@
 class Post:
     def __init__(self, postData, project):
         # we do this here to help autosuggest figure out what project is
-        from cohost.models.project import Project
+        from cohost.models.project import Project  # noqa: F401
         self.postData = postData
         self.project = project  # type: Project
 
     def __str__(self) -> str:
         return "{}".format(self.filename)
-    
-    def edit(self, headline: str, blocks: list = [], cws: list = [], tags: list = [], adult: bool = False, draft = False):
+
+    def edit(self, headline: str, blocks: list = [], cws: list = [],
+             tags: list = [], adult: bool = False, draft=False):
         from cohost.models.project import EditableProject
         if type(self.project) != EditableProject:
-            raise AttributeError("Post isn't attached to an EditableProject - do you have Edit permissions for this post?")
-        return self.project.editPost(self.postId, headline=headline, blocks=blocks, cws=cws, tags=tags, adult=adult, draft=draft)
+            raise AttributeError("Post isn't attached to an EditableProject -\
+                                 do you have Edit permissions for this post?")
+        return self.project.editPost(
+            self.postId,
+            headline=headline,
+            blocks=blocks,
+            cws=cws,
+            tags=tags,
+            adult=adult,
+            draft=draft
+        )
 
     @property
     def postId(self):
@@ -54,8 +64,8 @@ class Post:
     def tags(self) -> list:
         return self.postData['tags']
 
-    """Build 
-    
+    """Build
+
     Returns:
         list[str]: Return a list of blocks that make up a post
     """
@@ -79,7 +89,7 @@ class Post:
     @property
     def shareTree(self):
         return self.postData['shareTree']
-    
+
     @property
     def relatedProjects(self) -> list:
         projects = []
@@ -97,8 +107,7 @@ class Post:
 
     @property
     def contributorBlock(self) -> bool:
-        # i haven't blocked anyone or been blocked (i think) so idk how this works
-        # anyone who gets blocekd a lot pls test this
+        # NOTE: This is still untested as I'm still not sure how blocks work
         return self.postData['contributorBlockIncomingOrOutgoing']
 
     @property

@@ -7,27 +7,41 @@ class BaseNotification:
     def timestamp(self):
         return self.createdAt
 
+
 class Like(BaseNotification):
     def __init__(self, createdAt, fromProject, toPost, relationshipId):
         super().__init__(createdAt, fromProject)
         self.toPost = toPost
         self.relationshipId = relationshipId
-    
+
     def __str__(self) -> str:
-        return "{} liked {} | {}".format(self.fromProject.handle, self.toPost.postId, self.timestamp)
+        return "{} liked {} | {}".format(
+            self.fromProject.handle,
+            self.toPost.postId,
+            self.timestamp
+        )
 
 
 class Share(BaseNotification):
-    def __init__(self, createdAt, fromProject, toPost, sharePost, transparentShare):
+    def __init__(self, createdAt, fromProject,
+                 toPost, sharePost, transparentShare):
         super().__init__(createdAt, fromProject)
         self.toPost = toPost
         self.sharePost = sharePost
         self.transparentShare = transparentShare
-    
+
     def __str__(self) -> str:
         if self.transparentShare:
-            return "{} shared {} with extra | {}".format(self.fromProject.handle, self.toPost.postId, self.timestamp)
-        return "{} shared {} | {}".format(self.fromProject.handle, self.toPost.postId, self.timestamp)
+            return "{} shared {} with extra | {}".format(
+                self.fromProject.handle,
+                self.toPost.postId,
+                self.timestamp
+            )
+        return "{} shared {} | {}".format(
+            self.fromProject.handle,
+            self.toPost.postId,
+            self.timestamp
+        )
 
 
 class Comment(BaseNotification):
@@ -38,19 +52,37 @@ class Comment(BaseNotification):
         self.inReplyTo = inReplyTo
 
     def __str__(self) -> str:
-        if self.toPost == None:
-            return "{} commented on [post that couldn't be retrieved] - \"{}\" | {}".format(self.fromProject.handle, self.comment.body, self.timestamp)
-        return "{} commented on {} - \"{}\" | {}".format(self.fromProject.handle, self.toPost.postId, self.comment.body, self.timestamp)
+        if self.toPost is None:
+            return (f"{self.fromProject.handle} commented on " +
+                    + "[post that couldn't be retrieved]- " +
+                    f"\"{self.comment.body}\" | {self.timestamp}")
+        return "{} commented on {} - \"{}\" | {}".format(
+            self.fromProject.handle,
+            self.toPost.postId,
+            self.comment.body,
+            self.timestamp
+        )
+
 
 class Follow(BaseNotification):
     def __init__(self, createdAt, fromProject):
         super().__init__(createdAt, fromProject)
-    
+
     def __str__(self) -> str:
-        return "{} is now following you | {}".format(self.fromProject.handle, self.timestamp)
+        return "{} is now following you | {}".format(
+            self.fromProject.handle,
+            self.timestamp
+        )
+
 
 """Unwrap a raw notification list's grouped notifications
+
+
+    Returns:
+        list: unwrapped notification list
 """
+
+
 def unwrapGroupedNotifications(notificationsRaw: dict):
     unwrapped = []
     # Unwrap any grouped notifications
@@ -78,14 +110,16 @@ def unwrapGroupedNotifications(notificationsRaw: dict):
             })
     return unwrapped
 
+
 def buildFromNotifList(notificationsApiResp: dict, user):
     from cohost.models.comment import Comment as CommentModel
-    from cohost.models.post import Post
-    from cohost.models.user import User
+    from cohost.models.post import Post  # noqa: F401
+    from cohost.models.user import User  # noqa: F401
     u = user  # type: User
-    user = u  # this whole shitshow is to get intellisense working without circular imports
+    user = u  # this gets intellisense working without circular imports
     # I Love Python
-    # We need the user to do API operations upon - it helps us resolve things like projects!
+    # We need the user to do API operations upon
+    # It helps us resolve things like projects!
     commentsRaw = notificationsApiResp.get('comments')
     postsRaw = notificationsApiResp.get('posts')
     projectsRaw = notificationsApiResp.get('projects')
@@ -127,10 +161,12 @@ def buildFromNotifList(notificationsApiResp: dict, user):
                     break
             # we still have other notifications to be processed
             nextNotif['attemptsToProcess'] += 1
-            if not found and len(commentQueue) > 0 and not(nextNotif['attemptsToProcess'] > 50):
+            if (not found and len(commentQueue) > 0
+                    and (not nextNotif['attemptsToProcess'] > 50)):
                 commentQueue.append(nextNotif)
                 continue
-        # Ok, sick, so, we either don't have a reply, or we do but it's already processed!
+        # Ok, sick, so, we either don't have a reply
+        # ... or we do but it's already processed!
         # we need pull the Project for this comment
         posterProject = None
         for project in projects:
@@ -139,7 +175,8 @@ def buildFromNotifList(notificationsApiResp: dict, user):
         c = CommentModel(nextNotif['canEdit'], nextNotif['canInteract'],
                          nextNotif, posterProject, user, replyComment)
         comments.append(c)
-    # Unwrap grouped notifications - a "grouped" notif will cause breaking behaviour to older tools
+    # Unwrap grouped notifications
+    # a "grouped" notif will cause breaking behaviour to older tools
     notificationsRaw = unwrapGroupedNotifications(notificationsRaw)
     # and NOW we can finally map our notifications to all of our data models
     # TODO: Build notification model
@@ -178,14 +215,36 @@ def buildFromNotifList(notificationsApiResp: dict, user):
                     break
         # sick, we can now handle whichever type of notification this is
         if notification['type'] == 'like':
-            notifications.append(Like(
-                notification['createdAt'], fromProject, toPost, notification['relationshipId']))
+            notifications.append(
+                Like(
+                    notification['createdAt'],
+                    fromProject,
+                    toPost,
+                    notification['relationshipId']
+                )
+            )
         if notification['type'] == "share":
-            notifications.append(Share(
-                notification['createdAt'], fromProject, toPost, sharePost, notification['transparentShare']))
+            notifications.append(
+                Share(
+                    notification['createdAt'],
+                    fromProject,
+                    toPost,
+                    sharePost,
+                    notification['transparentShare']
+                )
+            )
         if notification['type'] == "comment":
             notifications.append(
-                Comment(notification['createdAt'], fromProject, toPost, comment, inReplyTo))
+                Comment(
+                    notification['createdAt'],
+                    fromProject,
+                    toPost,
+                    comment,
+                    inReplyTo
+                )
+            )
         if notification['type'] == 'follow':
-            notifications.append(Follow(notification['createdAt'], fromProject))
+            notifications.append(
+                Follow(notification['createdAt'], fromProject)
+            )
     return notifications

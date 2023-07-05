@@ -1,10 +1,10 @@
 import logging
 import time
-
+import json.decoder
 import requests
 
-l = logging.getLogger(__name__)
-l.setLevel(logging.DEBUG)
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 API_BASE = "https://cohost.org/api/v1"
 
 cache = {}
@@ -35,7 +35,7 @@ def fetch(method: str, endpoint, data: dict, cookies="", complex=False):
     if not endpoint.startswith('/'):
         endpoint = "/" + endpoint
     url = API_BASE + endpoint
-    l.debug('{} to {}'.format(method, url))
+    logger.debug('{} to {}'.format(method, url))
     if method.lower() == "get":
         req = requests.get(url, cookies=cookies, params=data, headers=headers)
     elif method.lower() == "post":
@@ -45,13 +45,13 @@ def fetch(method: str, endpoint, data: dict, cookies="", complex=False):
     elif method.lower() == 'put':
         req = requests.put(url, cookies=cookies, json=data, headers=headers)
     else:
-        l.error('No such method handled: ' + method)
-        l.error('Defaulting to get')
+        logger.error('No such method handled: ' + method)
+        logger.error('Defaulting to get')
         return fetch("GET", endpoint, data, cookies, complex)
 
     try:
         res = req.json()
-    except:
+    except json.decoder.JSONDecodeError:
         res = req.text
 
     if (req.status_code >= 400 and method != 'put'):
@@ -64,7 +64,8 @@ def fetch(method: str, endpoint, data: dict, cookies="", complex=False):
     return res
 
 
-def fetchTrpc(methods: list, cookie: str, data: dict = None, methodType = "get"):
+def fetchTrpc(methods: list, cookie: str,
+              data: dict = None, methodType="get"):
     global cache
     """Fetch data from trpc API
 
@@ -81,12 +82,13 @@ def fetchTrpc(methods: list, cookie: str, data: dict = None, methodType = "get")
         m = ','.join(methods)
     cacheData = get_cache_data(cookie, m)
     if cacheData is not None:
-        l.debug('Cache hit!')
+        logger.debug('Cache hit!')
         return cacheData
     data = fetch(methodType, "/trpc/{}".format(m), data=data,
                  cookies=generate_login_cookies(cookie))
     set_cache_data(cookie, m, data)
     return data
+
 
 # Caching utils !
 def set_cache_data(cookie, key, data):
@@ -97,6 +99,7 @@ def set_cache_data(cookie, key, data):
         'time': time.time()
     }
 
+
 def get_cache_data(cookie, key):
     entry = cache.get(cookie, {}).get(key, None)
     if entry is None:
@@ -104,6 +107,7 @@ def get_cache_data(cookie, key):
     if time.time() - entry['time'] > timeout:
         return None
     return entry['data']
+
 
 def generate_login_cookies(cookie):
     return {
