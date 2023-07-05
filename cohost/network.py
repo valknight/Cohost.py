@@ -80,13 +80,15 @@ def fetchTrpc(methods: list, cookie: str,
         m = methods
     else:
         m = ','.join(methods)
-    cacheData = get_cache_data(cookie, m)
-    if cacheData is not None:
-        logger.debug('Cache hit!')
-        return cacheData
+    if methodType == "get":
+        cacheData = get_cache_data(cookie, m)
+        if cacheData is not None:
+            logger.debug('Cache hit!')
+            return cacheData
     data = fetch(methodType, "/trpc/{}".format(m), data=data,
                  cookies=generate_login_cookies(cookie))
-    set_cache_data(cookie, m, data)
+    if methodType == "get":
+        set_cache_data(cookie, m, data)
     return data
 
 
