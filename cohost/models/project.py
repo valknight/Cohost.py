@@ -105,6 +105,16 @@ class Project:
             posts.append(Post(post, self))
         return posts
 
+    def ask(self, content, sourceProject, anon=False):
+        from cohost.models.project import EditableProject
+        if type(sourceProject) != EditableProject:
+            raise TypeError("sourceProject must be an editable project")
+        sourceProject = sourceProject  # EditableProject
+        fetchTrpc('asks.send', sourceProject.user.cookie, {
+            "toProjectHandle": self.handle,
+            "content": content,
+            "anon": anon}, methodType='postjson')
+
 
 class EditableProject(Project):
     def __init__(self, user, projectId):
