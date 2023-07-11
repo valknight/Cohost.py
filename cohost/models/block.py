@@ -58,6 +58,8 @@ class AttachmentBlock(Block):
             content_type = 'image/png'
         elif self.filename.lower().endswith('.svg'):
             content_type = 'image/svg+xml'
+        elif self.filename.lower().endswith('.gif'):
+            content_type = 'image/gif'
         self.content_type = content_type
         with open(self.filepath, 'rb') as f:
             content_length = len(f.read())
