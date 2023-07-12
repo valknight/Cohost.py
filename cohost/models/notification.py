@@ -106,6 +106,7 @@ def unwrapGroupedNotifications(notificationsRaw: dict):
                 'relationshipId': relationshipId,
                 'sharePostId': sharePostId,
                 'createdAt': notif['createdAt'],
+                'toPostId': notif.get('toPostId', None),
                 'transparentShare': notif.get('transparentShare', None)
             })
     return unwrapped
