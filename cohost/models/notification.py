@@ -32,12 +32,12 @@ class Share(BaseNotification):
 
     def __str__(self) -> str:
         if self.transparentShare:
-            return "{} shared {} with extra | {}".format(
+            return "{} shared {} | {}".format(
                 self.fromProject.handle,
                 self.toPost.postId,
                 self.timestamp
             )
-        return "{} shared {} | {}".format(
+        return "{} shared {} with extra | {}".format(
             self.fromProject.handle,
             self.toPost.postId,
             self.timestamp
