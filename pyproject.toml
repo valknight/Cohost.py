@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "cohost"
-version = "0.3.2"
+version = "0.3.3"
 description = "Unofficial Python API wrapper for Cohost.org - the fourth website!"
 readme = "README.md"
 requires-python = ">=3.9"
