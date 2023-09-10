@@ -1,5 +1,6 @@
 from typing import Any
 
+
 class BaseNotification:
     def __init__(self, createdAt, fromProject):
         self.createdAt = createdAt

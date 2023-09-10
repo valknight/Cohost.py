@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any
 
 from cohost.models.block import AttachmentBlock
 from cohost.models.post import Post
@@ -109,7 +109,7 @@ class Project:
 
     def ask(self, content, sourceProject, anon=False):
         from cohost.models.project import EditableProject
-        if type(sourceProject) != EditableProject:
+        if not isinstance(sourceProject, EditableProject):
             raise TypeError("sourceProject must be an editable project")
         sourceProject = sourceProject  # EditableProject
         fetchTrpc('asks.send', sourceProject.user.cookie, {

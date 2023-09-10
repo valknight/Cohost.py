@@ -17,7 +17,13 @@ headers: dict[str, str] = {
 timeout = 30
 
 
-def fetch(method: str, endpoint: str, data: Optional[dict[str, Any]], cookies: dict[str, str] = {}, complex: bool = False) -> dict[str, Any]:
+def fetch(
+    method: str,
+    endpoint: str,
+    data: Optional[dict[str, Any]],
+    cookies: dict[str, str] = {},
+    complex: bool = False
+) -> dict[str, Any]:
     """Send requests to cohost API, and return back data
 
     Args:
@@ -87,7 +93,7 @@ def fetchTrpc(methods: list[str] | str, cookie: str,
             logger.debug('Cache hit!')
             return cacheData
     returnData = fetch(methodType, "/trpc/{}".format(m), data=data,
-                 cookies=generate_login_cookies(cookie))
+                       cookies=generate_login_cookies(cookie))
     assert isinstance(returnData, dict)
     if methodType == "get":
         set_cache_data(cookie, m, returnData)
