@@ -1,5 +1,6 @@
 import base64
 from hashlib import pbkdf2_hmac
+from typing import Any, Optional
 
 from cohost.models.notification import buildFromNotifList
 from cohost.models.project import EditableProject
@@ -48,7 +49,7 @@ class User:
         dict: Project dictionaries
     """
     @property
-    def editedProjectsRaw(self) -> dict:
+    def editedProjectsRaw(self) -> list[dict[str, Any]]:
         rawResp = fetchTrpc('projects.listEditedProjects', self.cookie)
         return rawResp['result']['data']['projects']
 
@@ -122,7 +123,7 @@ class User:
         # If this didn't error out, we're good!
         return u
 
-    def getProject(self, handle: str) -> EditableProject:
+    def getProject(self, handle: str) -> Optional[EditableProject]:
         # Retrieve a project that you can edit
         projects = self.editedProjects
         for project in projects:
@@ -135,8 +136,8 @@ class User:
         editableProjects = self.editedProjects
         for project in editableProjects:
             if project.projectId == projectData['projectId']:
-                return project  # type: EditableProject
-        return Project(self, projectData)  # type: Project
+                return project
+        return Project(self, projectData)
 
     @property
     def notifications(self):

@@ -3,7 +3,7 @@ class Post:
         # we do this here to help autosuggest figure out what project is
         from cohost.models.project import Project  # noqa: F401
         self.postData = postData
-        self.project = project  # type: Project
+        self.project = project
 
     def __str__(self) -> str:
         return "{}".format(self.filename)
@@ -11,7 +11,7 @@ class Post:
     def edit(self, headline: str, blocks: list = [], cws: list = [],
              tags: list = [], adult: bool = False, draft=False):
         from cohost.models.project import EditableProject
-        if type(self.project) != EditableProject:
+        if not isinstance(self.project, EditableProject):
             raise AttributeError("Post isn't attached to an EditableProject -\
                                  do you have Edit permissions for this post?")
         return self.project.editPost(

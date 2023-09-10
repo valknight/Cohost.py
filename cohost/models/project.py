@@ -1,13 +1,15 @@
+from typing import Any
+
 from cohost.models.block import AttachmentBlock
 from cohost.models.post import Post
 from cohost.network import fetch, generate_login_cookies, fetchTrpc
 
 
 class Project:
-    def __init__(self, user, data):
+    def __init__(self, user, data: dict[str, Any]):
         # this helps editors understand what we're setting
         from cohost.models.user import User  # noqa: F401
-        self.user = user  # type: User
+        self.user: User = user
         # we can't specify this type globally due to all kinds of import errors
         # but that gives us our login chain back, if that makes sense!
         self.projectId = data['projectId']
@@ -67,7 +69,7 @@ class Project:
         return self.projectInfo['avatarShape']
 
     @property
-    def projectInfo(self) -> str:
+    def projectInfo(self) -> dict[str, Any]:
         return self.data
 
     @property
@@ -107,7 +109,7 @@ class Project:
 
     def ask(self, content, sourceProject, anon=False):
         from cohost.models.project import EditableProject
-        if type(sourceProject) != EditableProject:
+        if not isinstance(sourceProject, EditableProject):
             raise TypeError("sourceProject must be an editable project")
         sourceProject = sourceProject  # EditableProject
         fetchTrpc('asks.send', sourceProject.user.cookie, {
@@ -119,7 +121,7 @@ class Project:
 class EditableProject(Project):
     def __init__(self, user, projectId):
         from cohost.models.user import User  # noqa: F401
-        self.user = user  # type: User
+        self.user = user
         # we can't specify this type globally due to all kinds of import errors
         # but that gives us our login chain back, if that makes sense!
         self.projectId = projectId
@@ -127,12 +129,12 @@ class EditableProject(Project):
             raise AttributeError("Project not found")
 
     @property
-    def projectInfo(self) -> str:
+    def projectInfo(self) -> dict[str, Any]:
         projects = self.user.editedProjectsRaw
         for project in projects:
             if project['projectId'] == self.projectId:
                 return project
-        return None
+        raise AttributeError("Project not found")
 
     def post(self, headline: str, blocks: list = [], cws: list = [],
              tags: list = [], adult: bool = False, draft=False):
@@ -189,7 +191,7 @@ class EditableProject(Project):
         attachments = []
         for b in blocks:
             if type(b) is AttachmentBlock:
-                attachments.append(b)  # type: AttachmentBlock
+                attachments.append(b)
             else:
                 blockL.append(b.dict)
 
@@ -250,7 +252,7 @@ class EditableProject(Project):
         attachments = []
         for b in blocks:
             if type(b) is AttachmentBlock:
-                attachments.append(b)  # type: AttachmentBlock
+                attachments.append(b)
             else:
                 blockL.append(b.dict)
 

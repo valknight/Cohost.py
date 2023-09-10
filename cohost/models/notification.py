@@ -1,3 +1,6 @@
+from typing import Any
+
+
 class BaseNotification:
     def __init__(self, createdAt, fromProject):
         self.createdAt = createdAt
@@ -54,7 +57,7 @@ class Comment(BaseNotification):
     def __str__(self) -> str:
         if self.toPost is None:
             return (f"{self.fromProject.handle} commented on " +
-                    + "[post that couldn't be retrieved]- " +
+                    "[post that couldn't be retrieved]- " +
                     f"\"{self.comment.body}\" | {self.timestamp}")
         return "{} commented on {} - \"{}\" | {}".format(
             self.fromProject.handle,
@@ -112,19 +115,19 @@ def unwrapGroupedNotifications(notificationsRaw: dict):
     return unwrapped
 
 
-def buildFromNotifList(notificationsApiResp: dict, user):
+def buildFromNotifList(notificationsApiResp: dict[str, Any], user):
     from cohost.models.comment import Comment as CommentModel
     from cohost.models.post import Post  # noqa: F401
     from cohost.models.user import User  # noqa: F401
-    u = user  # type: User
+    u = user
     user = u  # this gets intellisense working without circular imports
     # I Love Python
     # We need the user to do API operations upon
     # It helps us resolve things like projects!
-    commentsRaw = notificationsApiResp.get('comments')
-    postsRaw = notificationsApiResp.get('posts')
-    projectsRaw = notificationsApiResp.get('projects')
-    notificationsRaw = notificationsApiResp.get('notifications')
+    commentsRaw = notificationsApiResp.get('comments', [])
+    postsRaw = notificationsApiResp.get('posts', [])
+    projectsRaw = notificationsApiResp.get('projects', [])
+    notificationsRaw = notificationsApiResp.get('notifications', [])
     # Ok, so, now we HAVE all of this, we can build the notifications
     # First step: projects
     projects = []
@@ -147,7 +150,7 @@ def buildFromNotifList(notificationsApiResp: dict, user):
     commentQueue = []
     for c in commentsRaw:
         commentQueue.append(commentsRaw[c])
-    comments = []
+    comments: list[CommentModel] = []
     while len(commentQueue) > 0:
         nextNotif = commentQueue.pop(0)
         if nextNotif.get('attemptsToProcess', 0) == 0:
@@ -181,7 +184,7 @@ def buildFromNotifList(notificationsApiResp: dict, user):
     notificationsRaw = unwrapGroupedNotifications(notificationsRaw)
     # and NOW we can finally map our notifications to all of our data models
     # TODO: Build notification model
-    notifications = []
+    notifications: list[Like | Share | Comment | Follow] = []
     for notification in notificationsRaw:
         # first, let's resolve all the data back
         fromProject = None
