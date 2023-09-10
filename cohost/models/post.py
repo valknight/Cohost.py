@@ -3,7 +3,7 @@ class Post:
         # we do this here to help autosuggest figure out what project is
         from cohost.models.project import Project  # noqa: F401
         self.postData = postData
-        self.project = project  # type: Project
+        self.project = project
 
     def __str__(self) -> str:
         return "{}".format(self.filename)

@@ -1,3 +1,5 @@
+from typing import Any, Optional
+
 import requests
 
 from cohost.network import fetch, generate_login_cookies
@@ -39,7 +41,7 @@ class AttachmentBlock(Block):
     """A block that contains an attachment"""
 
     def __init__(self, filepath: str,
-                 attachment_id: str = None, alt_text=None) -> None:
+                 attachment_id: Optional[str] = None, alt_text=None) -> None:
         try:
             with open(filepath, 'rb') as f:
                 f.read()
@@ -60,19 +62,19 @@ class AttachmentBlock(Block):
             content_type = 'image/svg+xml'
         elif self.filename.lower().endswith('.gif'):
             content_type = 'image/gif'
-        self.content_type = content_type
+        self.content_type: Optional[str] = content_type
         with open(self.filepath, 'rb') as f:
             content_length = len(f.read())
-        self.content_length = content_length
-        self.attachment_id = attachment_id
-        self.alt_text = alt_text
+        self.content_length: int = content_length
+        self.attachment_id: Optional[str] = attachment_id
+        self.alt_text: str = alt_text
 
     @property
-    def dict(self) -> dict:
+    def dict(self) -> dict[str, Any]:
         aid = self.attachment_id
         if self.attachment_id is None:
             aid = "00000000-0000-0000-0000-000000000000"
-        toReturn = {
+        toReturn: dict[str, Any] = {
             'type': 'attachment',
             'attachment': {
                 'attachmentId': aid
