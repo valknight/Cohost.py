@@ -37,3 +37,6 @@ repository = "https://github.com/valknight/cohost.py"
 
 [tool.setuptools]
 packages = ["cohost", "cohost.models"]
+
+[tool.setuptools.package-data]
+"*" = ["py.typed"]
