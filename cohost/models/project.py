@@ -116,8 +116,8 @@ class Project:
             "toProjectHandle": self.handle,
             "content": content,
             "anon": anon}, methodType='postjson')
-    
-    def getAsks(self):
+
+    def getAsksRaw(self) -> list[dict]:
         rawResp = fetchTrpc('asks.listPending', self.user.cookie, {
             'input': {'projectHandle': self.handle}
         })
