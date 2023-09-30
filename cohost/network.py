@@ -1,5 +1,6 @@
 import logging
 import time
+import json
 import json.decoder
 import requests
 from typing import Any, Optional
@@ -92,6 +93,16 @@ def fetchTrpc(methods: list[str] | str, cookie: str,
         if cacheData is not None:
             logger.debug('Cache hit!')
             return cacheData
+    
+    # The trpc api expects values under "input" in a particular format, so we'll validate that here
+    if data and 'input' in data:
+        input_val = data.get('input')
+        if not isinstance(input_val, dict):
+            raise ValueError('"input" key must have a dict value')
+        # We need to serialize the input object to JSON here
+        # Default requests behavior doesn't handle nested dicts the way we want
+        data['input'] = json.dumps(input_val)
+
     returnData = fetch(methodType, "/trpc/{}".format(m), data=data,
                        cookies=generate_login_cookies(cookie))
     assert isinstance(returnData, dict)

@@ -117,6 +117,12 @@ class Project:
             "content": content,
             "anon": anon}, methodType='postjson')
 
+    def getAsksRaw(self) -> list[dict]:
+        rawResp = fetchTrpc('asks.listPending', self.user.cookie, {
+            'input': {'projectHandle': self.handle}
+        })
+        return rawResp['result']['data']['asks']
+
 
 class EditableProject(Project):
     def __init__(self, user, projectId):
