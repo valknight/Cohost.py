@@ -98,7 +98,7 @@ def fetchTrpc(methods: list[str] | str, cookie: str,
     if data and 'input' in data:
         input_val = data.get('input')
         if not isinstance(input_val, dict):
-            raise ValueError('For batch calls, there must be an "input" key with a dict value')
+            raise ValueError('"input" key must have a dict value')
         # We need to serialize the input object to JSON here
         # Default requests behavior doesn't handle nested dicts the way we want
         data['input'] = json.dumps(input_val)
