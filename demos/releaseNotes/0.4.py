@@ -52,7 +52,7 @@ def main():
     project = user.getProject(handle)
     otherProject = user.getProject("vallerie")
     otherProject.ask("woah hello from cohost.py", project, True)
-    newPost = project.post('cohost.py 0.3 - the ask-y update', blocks, tags=['cohost.py', 'python', 'development', 'cohost api'], draft=True)
+    newPost = project.post('cohost.py 0.4 - the ask-y update part 2', blocks, tags=['cohost.py', 'python', 'development', 'cohost api'], draft=True)
     print('Check out your post at {}'.format(newPost.url))
 
 if __name__ == '__main__':
