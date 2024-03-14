@@ -42,7 +42,7 @@ class Post:
 
     @property
     def transparentShareOfPostId(self):
-        return self.postData['transparentShareofPostId']
+        return self.postData['transparentShareOfPostId']
 
     @property
     def state(self):
