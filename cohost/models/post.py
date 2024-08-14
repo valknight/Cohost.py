@@ -23,6 +23,22 @@ class Post:
             adult=adult,
             draft=draft
         )
+    
+    def share(self, headline: str, blocks: list = [], cws: list = [], 
+              tags: list = [], adult: bool = False, draft=False):
+        from cohost.models.project import EditableProject
+        if not isinstance(self.project, EditableProject):
+            raise AttributeError("Post isn't attached to an EditableProject -\
+                                 do you have Post permissions for this project?")
+        return self.project.post(
+            headline=headline,
+            blocks=blocks,
+            cws=cws,
+            tags=tags,
+            adult=adult,
+            draft=draft,
+            shareOfPostId=self.postId
+            )
 
     @property
     def postId(self):
