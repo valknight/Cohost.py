@@ -143,7 +143,7 @@ class EditableProject(Project):
         raise AttributeError("Project not found")
 
     def post(self, headline: str, blocks: list = [], cws: list = [],
-             tags: list = [], adult: bool = False, draft=False):
+             tags: list = [], adult: bool = False, draft=False, shareOfPostId: int = None):
         # Basic flow: you send a POST to project/{handle}/posts
         # This gives us back a post ID, as well as a API link
         # For example:
@@ -209,8 +209,12 @@ class EditableProject(Project):
             'adultContent': adult,
             'blocks': blockL,
             'cws': cws,
-            'tags': tags
+            'tags': tags,
         }
+        if shareOfPostId is not None:
+            postData.update({
+                    'shareOfPostId': shareOfPostId
+                })
         req = fetch(
             'postJSON',
             '/project/{}/posts'.format(self.handle),
@@ -237,6 +241,10 @@ class EditableProject(Project):
             'cws': cws,
             'tags': tags
         }
+        if shareOfPostId is not None:
+            postData.update({
+                    'shareOfPostId': shareOfPostId
+                })
         req = fetch(
             'put',
             '/project/{}/posts/{}'.format(self.handle, req['postId']),
@@ -272,6 +280,7 @@ class EditableProject(Project):
             'cws': cws,
             'tags': tags
         }
+
         req = fetch(
             'put',
             '/project/{}/posts/{}'.format(self.handle, postId),
