@@ -1,3 +1,7 @@
+Cohost is soon entering read-only mode, and this project will receive no future updates. Rest well Eggbug ❤️
+
+---
+
 # Cohost.py
 
 ![Edit of Eggbug into the python logo](pybug_small.png)
